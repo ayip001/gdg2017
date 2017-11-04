@@ -1,0 +1,19 @@
+{
+  "name": "flashcart",
+  "version": "0.0.0",
+  "description": "shopping cart",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayip001/gdg2017.git"
+  },
+  "author": "ayip",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ayip001/gdg2017/issues"
+  },
+  "homepage": "https://github.com/ayip001/gdg2017#readme"
+}
