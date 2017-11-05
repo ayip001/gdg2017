@@ -23,9 +23,21 @@ db = firebase.database()
 # init
 app = Flask(__name__)
 
-@app.route("/", methods=["POST"])
+@app.route("/")
+@app.route("/index")
 def index():
-	return ("index ok")
+	return ("Flashcart RESTful API")
+
+# helpers
+def getCust(phone):
+	cxs = requests.get('https://qr-cart.firebaseio.com/data/customers.json').json()
+	for cx in cxs:
+		if cx is not None and cxs[cx]['phone'] == phone:
+			return (cxs[cx])
+	return (None)
+
+def getValue(itemid):
+	return (0)
 
 # shared methods
 @app.route("/login")
@@ -58,8 +70,11 @@ def getCart():
 	# else
 		# return cart
 	phone = str(request.args.get('phone'))
-	cx = requests.get(url_for('getCust', phone=phone, _external=True)).json()
-	return (jsonify(cx))
+	# cx = requests.get(url_for('getCust', phone=phone, _external=True)).json()
+	cx = getCust(phone)
+	if cx is not None and 'cart' in cx:
+		return (jsonify(cx['cart']))
+	return (jsonify({'cart' : {}}))
 
 @app.route("/getTotal")
 def getTotal():
@@ -81,26 +96,19 @@ def getProductImg():
 	return ("tmp prod img")
 
 # agent methods
-@app.route("/allCustomers")
-def allCustomers():
-	# no param
-	# get json requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
-	# clean up
-	# return
-    return requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
+@app.route("/allCust")
+def allCust():
+    return (jsonify(requests.get('https://qr-cart.firebaseio.com/data/customers.json').json()))
 
-@app.route("/getCust")
-def getCust():
-	phone = str(request.args.get('phone'))
-	cxs = requests.get('https://qr-cart.firebaseio.com/data/customers.json').json()
-	for cx in cxs:
-		if cx is not None and cx['phone'] == phone:
-			return (jsonify(cx))
-	return ("not found")
+@app.route("/searchCust")
+def searchCust():
+	search = str(request.args.get('search'))
+	return ("tmp search")
 
 @app.route("/confirm")
 def confirm():
-    return ("confirm payment")
+	phone = str(request.args.get('phone'))
+	return ("confirm payment")
 
 @app.route("/endDay")
 def endDay():
@@ -112,13 +120,19 @@ def signup():
 	# routed from login
 	return ("tmp signup")
 
-@app.route("/enterStore")
+@app.route("/enterStore") # storeno=0 to leave
 def enterStore():
-	return ("tmp enterStore")
-
-@app.route("/sendAlert")
-def sendAlert():
-	return ("cx nick has entered your store")
+	phone = str(request.args.get('phone'))
+	storeno = int(request.args.get('storeno'))
+	cxs = requests.get('https://qr-cart.firebaseio.com/data/customers.json').json()
+	for cx in cxs:
+		if cx is not None and cxs[cx]['phone'] == phone:
+			break
+	cxs[cx]['instore'] = storeno
+	# if storeno is not 0
+		# alert agent
+	r = requests.patch('https://qr-cart.firebaseio.com/data/customers.json', json={cx : cxs[cx]}).json()
+	return (jsonify(r))
 
 @app.route("/addItem")
 def addItem():
@@ -126,6 +140,9 @@ def addItem():
 
 @app.route("/updateQty") # to 0 to remove item
 def updateQty():
+	phone = str(request.args.get('phone'))
+	itemid = str(request.args.get('itemid'))
+	qty = int(request.args.get('qty'))
 	return ("tmp item qty updated")
 
 if __name__ == '__main__':
