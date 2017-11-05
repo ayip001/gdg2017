@@ -16,22 +16,46 @@
 import logging
 
 from flask import Flask
+import requests
+"""import pyrebase"""
 
+"""
+config = {
+  "authDomain": "qr-cart.firebaseapp.com",
+  "databaseURL": "https://qr-cart.firebaseio.com",
+  "storageBucket": "qr-cart.appspot.com"
+}
+
+firebase = pyrebase.initialize_app(config)
+
+db = firebase.database()
+"""
 
 app = Flask(__name__)
 
+@app.route("/")
+def index():
+    """data = db.child("data").get()"""
+    return requests.get('https://qr-cart.firebaseio.com/data.json').content
 
-@app.route('/')
-def hello():
-    return 'Hello World!2'
+
+@app.route("/customers")
+def customers():
+    return requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
+
+@app.route("/customers/<string:phone>/")
+def getCustomers(phone):
+    return requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
+
+@app.route("/products")
+def products():
+    return "Members"
 
 
-@app.errorhandler(500)
-def server_error(e):
-    # Log the error and stacktrace.
-    logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.', 500
+@app.route("/products/<string:product_id>/")
+def getProduct(product_id):
+    return product_id
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=True, ssl_context='adhoc')
 # [END app]
