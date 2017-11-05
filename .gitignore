@@ -1,1 +1,9 @@
-lib
+lib/
+env/
+
+*.pyc
+__pycache__/
+
+*.swp
+*.swo
+*~
