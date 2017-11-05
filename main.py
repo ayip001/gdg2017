@@ -15,7 +15,7 @@
 # [START app]
 import logging
 
-from flask import Flask
+from flask import Flask, request
 import requests
 """import pyrebase"""
 
@@ -43,18 +43,21 @@ def index():
 def customers():
     return requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
 
-@app.route("/customers/<string:phone>/")
-def getCustomers(phone):
-    return requests.get('https://qr-cart.firebaseio.com/data/customers.json').content
+@app.route("/customer/", methods=['GET'])
+def getCustomer():
+    phone = request.args['phone']
+    return requests.get('https://qr-cart.firebaseio.com/data/customers.json?orderBy="phone"&equalTo="'+phone+'"').content
 
 @app.route("/products")
 def products():
     return "Members"
 
 
-@app.route("/products/<string:product_id>/")
-def getProduct(product_id):
-    return product_id
+@app.route("/productImg/", methods=['GET'])
+def getProductImg():
+    product_id = request.args['id']
+
+    return requests.get('https://qr-cart.firebaseio.com/data/products_img.json?orderBy="id"&equalTo="'+product_id+'"').content
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True, ssl_context='adhoc')
