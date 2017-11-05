@@ -1,4 +1,4 @@
-# Copyright 2016 Google Inc. All rights reserved.
+# Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import webtest
-
-import main
+import pytest
 
 
-def test_get():
-    app = webtest.TestApp(main.app)
+@pytest.fixture
+def app():
+    import main
+    main.app.testing = True
+    return main.app.test_client()
 
-    response = app.get('/')
 
-    assert response.status_int == 200
-    assert response.body == 'Hello, World!'
+def test_index(app):
+    r = app.get('/')
+    assert r.status_code == 200
